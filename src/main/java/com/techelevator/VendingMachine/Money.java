@@ -1,18 +1,34 @@
 package com.techelevator.VendingMachine;
 
+import java.util.Scanner;
+
 public class Money {
 
-    private int moneyFed;
+    private double amount;
 
     public Money(){
-        this.moneyFed = 0;
+        amount = 0;
     }
 
-    public void addMoney(int amount){
-        this.moneyFed += amount;
+    public void feedMoney(){
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter amount to deposit: ");
+        double addedAmount = Integer.parseInt(scanner.nextLine());
+        while (addedAmount < 0){
+            System.out.println("Please enter a valid amount");
+            addedAmount = Integer.parseInt(scanner.nextLine());
+        }
+        amount += addedAmount;
+        System.out.println("Current money provided: $" + amount);
     }
 
-    public int getMoneyFed() {
-        return this.moneyFed;
+    public double getAmount() {
+        return amount;
     }
+
+    public void subtractAmount(double amountToSubtract){
+        amount -= amountToSubtract;
+    }
+
+
 }

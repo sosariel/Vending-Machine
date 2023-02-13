@@ -1,48 +1,45 @@
 package com.techelevator.VendingMachine;
 
-import java.util.Map;
-import java.util.TreeMap;
 
-import java.io.FileReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
-public class Inventory
-{
-    private FileReader fileReaderObject;
-    private TreeMap<String, Integer> inventoryList = new TreeMap<String, Integer>();
+public class Inventory {
 
-    public Inventory(FileReader fileReaderObject)
-    {
-        this.fileReaderObject =fileReaderObject;
-        stocksVendingMachineAtStartup();
-    }
+    private List<VendingMachineProducts> items;
 
-    public void stocksVendingMachineAtStartup()
-    {
-        for (String[] item : fileReaderObject.inventoryAsArrayList())
-        {
-            int initialStock = 5;
-            inventoryList.put(item[0], initialStock);
+    public Inventory(String fileName){
+        items = new ArrayList<>();
+        try (Scanner scanner = new Scanner(new File(fileName))){
+            while (scanner.hasNextLine()){
+                String line = scanner.nextLine();
+                String[] parts = line.split("\\|");
+                String slot = parts[0];
+                String name = parts[1];
+                double price = Double.parseDouble(parts[2]);
+                String category = parts[3];
+                items.add(new VendingMachineProducts(slot, name, price, category));
+            }
+        } catch (FileNotFoundException e){
+            e.printStackTrace();
         }
     }
 
-    public Map<String, Item> vendingMachineStock()
-    {
-        return fileReaderObject.createMapOfLocationAndItems();
+    public List<VendingMachineProducts> getSlotItem() {
+        return items;
     }
 
-    public void substractFromInventory(String slotLocation)
-    {
-        inventoryList.put(slotLocation, inventoryList.get(slotLocation) - 1);
+    public VendingMachineProducts getSlotItem(String slot){
+        for (VendingMachineProducts item : items){
+            if(item.getSlot().equals(slot)){
+                return item;
+            }
+        }
+        return null;
     }
 
-    public int returnCurrentInventory(String slotLocation)
-    {
-        return inventoryList.get(slotLocation);
-    }
 
-    public Map<String, Integer> returnInventoryMap()
-    {
-        return inventoryList;
-    }
 }
-

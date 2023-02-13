@@ -1,6 +1,8 @@
 package com.techelevator;
 
+import com.techelevator.VendingMachine.Inventory;
 import com.techelevator.VendingMachine.Money;
+import com.techelevator.VendingMachine.VendingMachineProducts;
 import com.techelevator.view.VendingMenu;
 
 import java.io.File;
@@ -23,12 +25,15 @@ public class VendingMachineCLI {
 	private static final String[] PURCHASE_MENU_OPTIONS = { PURCHASE_MENU_OPTION_FEED_MONEY, PURCHASE_MENU_OPTION_SELECT_PRODUCT, PURCHASE_MENU_OPTION_FINISH_TRANSACTION};
 
 	private VendingMenu menu;
+	private Inventory inventory;
 	private Money money;
 
-	public VendingMachineCLI(VendingMenu menu) {
+	public VendingMachineCLI(VendingMenu menu, Inventory inventory, Money money) {
 		this.menu = menu;
-		this.money = new Money();
+		this.inventory = inventory;
+		this.money = money;
 	}
+
 
 	public void run() {
 		boolean running = true;
@@ -49,45 +54,52 @@ public class VendingMachineCLI {
 	}
 
 	private void displayItems() {
-		try {
-			Scanner scanner = new Scanner(new File("vendingmachine.csv"));
-			while (scanner.hasNextLine()) {
-				String line = scanner.nextLine();
-				menu.getOut().println(line);
-			}
-			scanner.close();
-		} catch (FileNotFoundException e){
-			menu.getOut().println("File not found");
+		for(VendingMachineProducts item : inventory.getSlotItem()){
+			menu.getOut().println(String.format("%-4s %-20s $%-6.2f %s", item.getSlot(), item.getName(), item.getPrice(), item.getCategory()));
 		}
+		menu.getOut().println();
 	}
 
 	private void purchaseMenu(){
-		boolean inPurchaseMenu = true;
-		while (inPurchaseMenu){
+		boolean running = true;
+		while (running){
 			String purchaseChoice = (String) menu.getChoiceFromOptions(PURCHASE_MENU_OPTIONS);
 
-			if(purchaseChoice.equals(PURCHASE_MENU_OPTION_FEED_MONEY)){
-			menu.getOut().println("Enter amount to deposit:");
-			menu.getOut().flush();
-			try{
-				int amount = Integer.parseInt(menu.getIn().nextLine());
-				money.addMoney(amount);
-				menu.getOut().println("Current money provided: $" + money.getMoneyFed());
-			} catch (NumberFormatException e){
-				menu.getOut().println("Please enter a valid amount");
-			}
-			} else if (purchaseChoice.equals(PURCHASE_MENU_OPTION_SELECT_PRODUCT)){
-
+			if(purchaseChoice.equals(PURCHASE_MENU_OPTION_FEED_MONEY)) {
+				money.feedMoney();
+			} else if (purchaseChoice.equals(PURCHASE_MENU_OPTION_SELECT_PRODUCT)) {
+				selectProduct();
 			} else if (purchaseChoice.equals(PURCHASE_MENU_OPTION_FINISH_TRANSACTION)){
-				inPurchaseMenu = false;
+				running = false;
 			}
 		}
+	}
+
+	private void selectProduct(){
+		displayItems();
+		menu.getOut().println("Enter slot number:");
+		menu.getOut().flush();
+		String slot = menu.getIn().nextLine();
+		VendingMachineProducts item = inventory.getSlotItem(slot);
+		if (item != null){
+			if (item.getPrice() <= money.getAmount()){
+				money.subtractAmount(item.getPrice());
+				menu.getOut().println("Dispensing: " + item.getName() + "\nCost: $" + item.getPrice() + "\nMoney remaining: $" + money.getAmount());
+			} else {
+				menu.getOut().println("Insufficient funds");
+			}
+		} else {
+			menu.getOut().println("Invalid slot selected");
+		}
+		menu.getOut().flush();
 	}
 
 
 	public static void main(String[] args) {
 		VendingMenu menu = new VendingMenu(System.in, System.out);
-		VendingMachineCLI cli = new VendingMachineCLI(menu);
+		Inventory inventory = new Inventory("vendingmachine.csv");
+		Money money = new Money();
+		VendingMachineCLI cli = new VendingMachineCLI(menu, inventory, money);
 		cli.run();
 	}
 }
