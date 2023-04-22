@@ -21,14 +21,31 @@ public class Inventory {
                 String name = parts[1];
                 double price = Double.parseDouble(parts[2]);
                 String category = parts[3];
-                items.add(new VendingMachineProducts(slot, name, price, category));
+                switch (category){
+                    case "Chip":
+                        items.add(new Chip(slot, name, price, category));
+                        break;
+                    case "Candy":
+                        items.add(new Candy(slot, name, price, category));
+                        break;
+                    case "Drink":
+                        items.add(new Drink(slot, name, price, category));
+                        break;
+                    case "Gum":
+                        items.add(new Gum(slot, name, price, category));
+                        break;
+                    default:
+                        items.add(new VendingMachineProducts(slot, name, price, category));
+                        break;
+                }
+
             }
         } catch (FileNotFoundException e){
             e.printStackTrace();
         }
     }
 
-    public List<VendingMachineProducts> getSlotItem() {
+    public List<VendingMachineProducts> getAllSlotItems() {
         return items;
     }
 

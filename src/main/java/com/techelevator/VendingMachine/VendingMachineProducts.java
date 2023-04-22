@@ -30,4 +30,10 @@ public class VendingMachineProducts {
     public String getCategory() {
         return category;
     }
+
+    public void displayMessage(){
+        System.out.println("Quote");
+    }
+
+
 }

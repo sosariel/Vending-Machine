@@ -13,10 +13,10 @@ public class Money {
     public void feedMoney(){
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter amount to deposit: ");
-        double addedAmount = Integer.parseInt(scanner.nextLine());
+        double addedAmount = Double.parseDouble(scanner.nextLine());
         while (addedAmount < 0){
             System.out.println("Please enter a valid amount");
-            addedAmount = Integer.parseInt(scanner.nextLine());
+            addedAmount = Double.parseDouble(scanner.nextLine());
         }
         amount += addedAmount;
         System.out.println("Current money provided: $" + amount);

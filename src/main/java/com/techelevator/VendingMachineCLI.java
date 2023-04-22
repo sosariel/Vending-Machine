@@ -5,9 +5,6 @@ import com.techelevator.VendingMachine.Money;
 import com.techelevator.VendingMachine.VendingMachineProducts;
 import com.techelevator.view.VendingMenu;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
 
 
 public class VendingMachineCLI {
@@ -40,13 +37,13 @@ public class VendingMachineCLI {
 		while (running) {
 			String choice = (String) menu.getChoiceFromOptions(MAIN_MENU_OPTIONS);
 
-			// A switch statement could also be used here.  Your choice.
+
 			if (choice.equals(MAIN_MENU_OPTION_DISPLAY_ITEMS)) {
 				displayItems();
-				// display vending machine items
+
 			} else if (choice.equals(MAIN_MENU_OPTION_PURCHASE)) {
 				purchaseMenu();
-				// do purchase
+
 			} else if (choice.equals(MAIN_MENU_OPTION_EXIT)) {
 				running = false;
 			}
@@ -54,7 +51,7 @@ public class VendingMachineCLI {
 	}
 
 	private void displayItems() {
-		for(VendingMachineProducts item : inventory.getSlotItem()){
+		for(VendingMachineProducts item : inventory.getAllSlotItems()){
 			menu.getOut().println(String.format("%-4s %-20s $%-6.2f %s", item.getSlot(), item.getName(), item.getPrice(), item.getCategory()));
 		}
 		menu.getOut().println();
@@ -85,6 +82,7 @@ public class VendingMachineCLI {
 			if (item.getPrice() <= money.getAmount()){
 				money.subtractAmount(item.getPrice());
 				menu.getOut().println("Dispensing: " + item.getName() + "\nCost: $" + item.getPrice() + "\nMoney remaining: $" + money.getAmount());
+				item.displayMessage();
 			} else {
 				menu.getOut().println("Insufficient funds");
 			}
